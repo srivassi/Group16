@@ -1,55 +1,63 @@
-import requests
+import os
+from atproto import Client
+from dotenv import load_dotenv
 
-# Replace with your Bluesky handle and password
-BLUESKY_HANDLE = 'christyyyyyyy.bsky.social'
-PASSWORD = 'gfgt-vazt-kwey-g2pf'
+# Initialize the Bluesky API client
+load_dotenv()
+client = Client()
 
-# Endpoint for creating a session
-auth_url = 'https://bsky.social/xrpc/com.atproto.server.createSession'
+# Replace with your Bluesky credentials
+USERNAME = os.getenv("BLUESKY_API_USERNAME")
+PASSWORD = os.getenv("BLUESKY_API_PASSWORD")
 
-# Payload for authentication
-auth_payload = {
-    'identifier': BLUESKY_HANDLE,
-    'password': PASSWORD
-}
+# Authenticate the client
+client.login(USERNAME, PASSWORD)
 
+# Define the search keyword
+keyword = "#Donald"  # Search for posts with this keyword or hashtag
 
-# Authenticate and obtain access token
-response = requests.post(auth_url, json=auth_payload)
-response_data = response.json()
+# Optional: Date range filtering (modify as needed)
+since_date = "2024-01-01T00:00:00Z"  # Start date (YYYY-MM-DDTHH:MM:SSZ)
+until_date = "2024-12-31T23:59:59Z"  # End date (YYYY-MM-DDTHH:MM:SSZ)
 
-if response.status_code == 200:
-    access_token = response_data['accessJwt']
-    print("Authentication successful!")
-else:
-    print("Authentication failed:", response_data)
-# Define the keyword to search for
-keyword = 'example'
-
-# Endpoint for searching posts
-search_url = 'https://bsky.social/xrpc/app.bsky.feed.searchPosts'
-
-# Set up headers with the access token
-headers = {
-    'Authorization': f'Bearer {access_token}',
-    'Content-Type': 'application/json'
-}
-
-# Parameters for the search
+# Initialize parameters for the search
 params = {
-    'q': keyword
+    'q': keyword,
+    'limit': 10,  # Number of posts to retrieve per request
+    'since': since_date,  # Optional: Start date
+    'until': until_date   # Optional: End date
 }
 
-# Perform the search request
-search_response = requests.get(search_url, headers=headers, params=params)
-search_results = search_response.json()
+# Perform the search with pagination
+while True:
+    try:
+        # Request posts from the Bluesky API
+        response = client.app.bsky.feed.search_posts(params)
 
-if search_response.status_code == 200:
-    print(f"\nPosts containing the keyword '{keyword}':")
-    print("=" * 50)
-    for post in search_results.get('posts', []):
-        author = post['author']['handle']
-        content = post['record']['text']
-        print(f"{author}: {content}\n")
-else:
-    print("Search failed:", search_results)
+        # Debug: Print the raw response to inspect structure
+        print("Raw Response:", response)
+
+        # Extract posts from response
+        posts = response.posts  # Correctly accessing posts attribute
+
+        if posts:
+            print(f"Found {len(posts)} posts for '{keyword}':\n")
+            for post in posts:
+                author = post.author.handle
+                content = post.record.text
+                timestamp = post.record.created_at
+                print(f"Author: {author}\nTime: {timestamp}\nPost: {content}\n{'-'*50}")
+        else:
+            print("No posts found.")
+            break
+
+        # Check for the presence of a cursor for pagination
+        if response.cursor:
+            params['cursor'] = response.cursor  # Correctly accessing cursor
+        else:
+            # No more pages to fetch
+            break
+
+    except Exception as e:
+        print(f"Error: {e}")
+        break
