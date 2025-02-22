@@ -1,0 +1,17 @@
+# Frontend: Ignore Node.js modules folder
+/frontend/node_modules
+
+# Backend: Ignore Python virtual environment folder
+/backend/venv
+
+# Environment variables file (if you have one)
+.env
+
+## Optional: Ignore PyCharm project configuration files
+#.idea
+#
+## Optional: Ignore Next.js build output
+#/frontend/.next
+#
+## Optional: Ignore log files
+#*.log
