@@ -1,111 +1,93 @@
 import os
-import requests
 import json
+import requests
+from atproto import Client
 from dotenv import load_dotenv
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from flask import Flask, request, jsonify
-import openai
 
-# Load environment variables from .env or your IDE configuration.
+# Load environment variables
 load_dotenv()
 
-app = Flask(__name__)
+# Initialize sentiment analyzer
+analyzer = SentimentIntensityAnalyzer()
 
-# Load your credentials for Twitter and OpenAI.
+# Twitter API credentials
 api_key = os.getenv("API_KEY")
 api_secret = os.getenv("API_SECRET")
 bearer_token = os.getenv("BEARER_TOKEN")
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
-def fetch_tweets():
-    """
-    Fetches recent tweets matching the query and performs sentiment analysis.
-    """
-    headers = {
-        "Authorization": f"Bearer {bearer_token}",
-        "User-Agent": "v2RecentSearchPython"
-    }
+# Bluesky API credentials
+USERNAME = os.getenv("BLUESKY_API_USERNAME")
+PASSWORD = os.getenv("BLUESKY_API_PASSWORD")
+
+# Initialize Bluesky client
+client = Client()
+client.login(USERNAME, PASSWORD)
+
+
+# Function to fetch tweets from Twitter API
+def fetch_twitter_posts(keyword, max_results=100):
     url = "https://api.twitter.com/2/tweets/search/recent"
-    analyzer = SentimentIntensityAnalyzer()
-    tweets_data = []
-    # Note: Combine hashtags with a space so both are searched.
-    params = {
-        "query": "#MAGICMAN #JacksonWang",
-        "max_results": 30,
-        "tweet.fields": "created_at,author_id,public_metrics"
-    }
+    headers = {"Authorization": f"Bearer {bearer_token}", "User-Agent": "v2RecentSearchPython"}
+    params = {"query": keyword, "max_results": max_results, "tweet.fields": "created_at,author_id"}
     response = requests.get(url, headers=headers, params=params)
+
+    tweets_data = []
     if response.status_code == 200:
         tweets = response.json().get("data", [])
         for tweet in tweets:
             text = tweet.get("text", "")
-            metrics = tweet.get("public_metrics", {})
             sentiment = analyzer.polarity_scores(text)
-            tweet_info = {
-                "text": text,
-                "public_metrics": metrics,
-                "sentiment": sentiment
-            }
-            tweets_data.append(tweet_info)
-    else:
-        print(f"Error: {response.status_code} - {response.text}")
+            tweets_data.append({"source": "Twitter", "text": text, "sentiment": sentiment})
     return tweets_data
 
-# Fetch tweets on startup (or you can schedule this periodically).
-tweets_data = fetch_tweets()
 
-def get_relevant_tweets(query, tweets):
-    """
-    Simple filtering: returns tweets where the query string appears in the text.
-    """
-    query_lower = query.lower()
-    return [tweet for tweet in tweets if query_lower in tweet["text"].lower()]
-
-def build_system_prompt(relevant_tweets):
-    """
-    Builds a system prompt containing the context of relevant tweets and their sentiment.
-    """
-    if not relevant_tweets:
-        context_text = "No tweets were found matching the query."
-    else:
-        context_text = "\n".join(
-            f"Tweet: {tweet['text']} (Sentiment: {tweet['sentiment']})"
-            for tweet in relevant_tweets
-        )
-    system_prompt = (
-        "You are a helpful assistant that answers questions based solely on a provided dataset of tweets "
-        "and their sentiment scores. Below is the dataset context:\n\n"
-        f"{context_text}\n\n"
-        "Answer the user's question using only the above information."
-    )
-    return system_prompt
-
-@app.route('/api/chat', methods=['POST'])
-def chat():
-    data = request.json
-    user_query = data.get("query")
-    if not user_query:
-        return jsonify({"error": "No query provided"}), 400
-
-    # Retrieve tweets relevant to the query.
-    relevant_tweets = get_relevant_tweets(user_query, tweets_data)
-    system_prompt = build_system_prompt(relevant_tweets)
-
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_query}
-    ]
+# Function to fetch posts from Bluesky API
+def fetch_bluesky_posts(keyword, limit=100):
+    params = {'q': keyword, 'limit': limit}
+    posts_data = []
 
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=messages
-        )
-        assistant_reply = response["choices"][0]["message"]["content"]
-        return jsonify({"reply": assistant_reply})
+        response = client.app.bsky.feed.search_posts(params)
+        posts = response.posts
+        if posts:
+            for post in posts:
+                text = post.record.text
+                sentiment = analyzer.polarity_scores(text)
+                posts_data.append({"source": "Bluesky", "text": text, "sentiment": sentiment})
     except Exception as e:
-        print("OpenAI API error:", e)
-        return jsonify({"error": "Error communicating with OpenAI API"}), 500
+        print(f"Bluesky API Error: {e}")
+    return posts_data
 
-if __name__ == '__main__':
-    app.run(port=5000)
+
+# Main execution
+keyword = "Pope Francis"  # Change the keyword if needed
+
+# Fetch posts from both sources
+twitter_posts = fetch_twitter_posts(keyword, max_results=100)
+bluesky_posts = fetch_bluesky_posts(keyword, limit=100)
+
+# Combine results
+all_posts = twitter_posts + bluesky_posts
+
+# Calculate aggregate sentiment score
+if all_posts:
+    total_compound = sum(post["sentiment"]["compound"] for post in all_posts)
+    avg_compound = total_compound / len(all_posts)
+    aggregate_sentiment = ((avg_compound + 1) / 2) * 100  # Convert to 0-100 scale
+else:
+    aggregate_sentiment = None
+
+# Save results to JSON
+output_data = {
+    "keyword": keyword,
+    "aggregate_sentiment": aggregate_sentiment,
+    "posts": all_posts
+}
+
+with open("sentiment_results.json", "w", encoding="utf-8") as f:
+    json.dump(output_data, f, indent=4)
+
+# Print summary
+print(f"Aggregate Sentiment Score: {aggregate_sentiment}")
+print(f"Total Posts Analyzed: {len(all_posts)}")
