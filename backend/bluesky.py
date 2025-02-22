@@ -13,6 +13,7 @@ auth_payload = {
     'password': PASSWORD
 }
 
+
 # Authenticate and obtain access token
 response = requests.post(auth_url, json=auth_payload)
 response_data = response.json()
