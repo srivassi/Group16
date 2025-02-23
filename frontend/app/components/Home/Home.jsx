@@ -16,6 +16,8 @@ const Home = () => {
 
   // State for JSON response
   const [searchResult, setSearchResult] = useState(null);
+  const [chatInput, setChatInput] = useState("");
+  const [chatMessages, setChatMessages] = useState([]);
 
   useEffect(() => {
     if (!vantaEffect) {
@@ -49,58 +51,37 @@ const Home = () => {
     tag.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Simulated API response
-  const mockResponse = {
-    keyword: "Pope Francis",
-    aggregate_sentiment: 65.4,
-    posts: [
-      {
-        source: "Twitter",
-        text: "Pope Francis calls for peace and unity in his latest speech.",
-        sentiment: {
-          neg: 0.0,
-          neu: 0.7,
-          pos: 0.3,
-          compound: 0.6,
-        },
-      },
-      {
-        source: "Twitter",
-        text: "Pope Francis addresses climate change and the need for action.",
-        sentiment: {
-          neg: 0.1,
-          neu: 0.6,
-          pos: 0.3,
-          compound: 0.5,
-        },
-      },
-      {
-        source: "Bluesky",
-        text: "Pope Francis emphasizes the importance of compassion and empathy.",
-        sentiment: {
-          neg: 0.0,
-          neu: 0.5,
-          pos: 0.5,
-          compound: 0.7,
-        },
-      },
-      {
-        source: "Bluesky",
-        text: "Pope Francis speaks about the role of faith in modern society.",
-        sentiment: {
-          neg: 0.0,
-          neu: 0.8,
-          pos: 0.2,
-          compound: 0.4,
-        },
-      },
-    ],
-  };
-
-  // Handle search submission on Enter key
+  // Handle search submission on Enter key using the getPosts route
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      setSearchResult(mockResponse); // Replace with actual API call
+      fetch("http://localhost:5000/api/getPosts", {  // updated URL to include port 5000
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ keyword: search || "Pope Francis" }),
+      })
+        .then((res) => res.json())
+        .then((data) => setSearchResult(data))
+        .catch((error) => console.error("Error fetching posts:", error));
+    }
+  };
+
+  // Handle chat message submission on Enter key using the /api/chat route (only after getPosts)
+  const handleChatKeyDown = (e) => {
+    if (e.key === "Enter" && searchResult) {
+      fetch("http://localhost:5000/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",  // ensures cookies are sent
+        body: JSON.stringify({ query: chatInput }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setChatMessages((prev) => [...prev, { sender: "user", text: chatInput }]);
+          setChatMessages((prev) => [...prev, { sender: "bot", text: data.reply }]);
+          setChatInput("");
+        })
+        .catch((error) => console.error("Error with chat:", error));
     }
   };
 
@@ -140,6 +121,31 @@ const Home = () => {
                 </li>
               ))}
             </ul>
+          </div>
+        )}
+
+        {/* Chat section always visible if posts have been fetched */}
+        {searchResult && (
+          <div className="chat-section">
+            <h3>Chat With Bot</h3>
+            <div className="chat-log">
+              {chatMessages.length === 0 ? (
+                <p>No conversation yet.</p>
+              ) : (
+                chatMessages.map((msg, index) => (
+                  <div key={index} className={`chat-message ${msg.sender}`}>
+                    <strong>{msg.sender === "user" ? "You" : "Bot"}:</strong> {msg.text}
+                  </div>
+                ))
+              )}
+            </div>
+            <input
+              type="text"
+              placeholder="Enter your message..."
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              onKeyDown={handleChatKeyDown}
+            />
           </div>
         )}
       </div>
