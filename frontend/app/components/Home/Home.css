@@ -1,3 +1,8 @@
+/* Global font applied for the entire page */
+body {
+  font-family: "Disket Mono", monospace;
+}
+
 .main {
   position: relative;
   width: 100vw;
@@ -91,47 +96,84 @@ input {
 .search-results {
   background-color: #fff;
   color: #000;
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  margin-top: 20px;
-  max-width: 600px;
-  width: 90%;
+  padding: 20px; /* Increased padding */
+  border-radius: 12px; /* More rounded corners */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Deeper shadow for a prettier look */
+  margin-top: 30px;
+  max-width: 70%; /* Make it bigger */
+  width: 70%;
   overflow-y: auto;
   text-align: left;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(240, 240, 240, 0.9)); /* Subtle gradient with transparency */
+  font-size: 1rem; /* Slightly larger font */
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
 }
 
-
-.search-results h2 {
-  color: #ff3f81;
-  margin-bottom: 10px;
-}
-
-
+/* Remove duplicate ul definition and use grid items */
 .search-results ul {
   list-style: none;
   padding: 0;
+  margin: 0;
+  display: contents;
 }
 
-
+/* Format each post card */
 .search-results li {
   background: #f8f9fa;
-  margin: 10px 0;
-  padding: 10px;
-  border-radius: 5px;
-  border-left: 4px solid #e47ca1;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #dedede;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.search-results li:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
 
 .search-results li strong {
   color: #7453ac;
 }
 
+.search-results h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  color: #ff3f81;
+  margin-bottom: 15px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Update aggregate sentiment paragraph styling inside .search-results */
+.search-results p {
+  font-size: 1.2rem;
+  text-align: center;
+  margin: 10px 0 20px;
+  background: linear-gradient(90deg, #ff80ab, #ff3f81);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Optionally, if you want a slight container for the aggregate sentiment text, you could add: */
+/*
+.aggregate-container {
+  padding: 10px;
+  border: 1px dashed #ff3f81;
+  border-radius: 8px;
+  margin: 0 auto 20px;
+  max-width: 80%;
+  text-align: center;
+}
+*/
+
 .chat-window {
   position: fixed;
-  bottom: 20px;
+  bottom: 100px;
   right: 20px;
-  width: 300px;
+  width: 450px;
   max-height: 400px;
   background-color: #fff;
   border: 2px solid #ff3f81;
@@ -142,6 +184,19 @@ input {
   display: flex;
   flex-direction: column;
   z-index: 1000;
+  transition: max-height 0.3s ease;
+}
+
+.chat-window.minimized {
+  max-height: 50px; /* Only header visible */
+}
+
+.chat-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid #ff3f81;
+  padding-bottom: 5px;
 }
 
 .chat-window h3 {
@@ -164,4 +219,22 @@ input {
   border: 1px solid #ccc;
   border-radius: 5px;
   box-sizing: border-box;
+}
+
+.chat-message {
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+}
+
+.chat-message.user {
+  background-color: #e6f7ff;
+  border-color: #91d5ff;
+}
+
+.chat-message.bot {
+  background-color: #fffbe6;
+  border-color: #ffe58f;
 }
