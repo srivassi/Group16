@@ -1,5 +1,7 @@
 import requests
 
+#This is a testing file, it is used to test the requests from the app.py file
+
 session = requests.Session()  # Create a persistent session
 
 # First, send a keyword to the /api/getPosts endpoint
