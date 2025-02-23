@@ -10,9 +10,9 @@ import Home from './components/Home/Home.jsx'
 /* 2 */
 //Title of the browser page 
 export const metadata = {
-  title: 'Home', // title
+  title: 'Project 16', // title
   icons: {
-    icon: '/vercel.svg', // logo'
+    icon: '/logo-16.png', // logo'
   },  
 };
 
