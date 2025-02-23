@@ -134,7 +134,8 @@ def build_system_prompt(full_data):
         "You are a helpful assistant that answers questions based solely on a provided dataset of posts "
         "and their sentiment scores. Below is the dataset context:\n\n"
         f"{context_text}\n\n"
-        "Answer the user's question using only the above information."
+        "You first generate a future plan of action on how the aggregate sentiment score can be improved and/or maintained. "
+        "Answer the user's question using the above information."
     )
     return system_prompt
 
