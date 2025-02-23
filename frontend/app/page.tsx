@@ -1,6 +1,6 @@
 // app/page.tsx
 import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/nextjs';
-import LandingPage from './components/Home/LandingPage';
+import Page from '@/app/components/landing/page';
 
 
 export const metadata = {
@@ -14,7 +14,7 @@ export default function HomePage() {
   return (
     <div>
       <SignedIn>
-        <LandingPage />
+        <Page />
       </SignedIn>
       <SignedOut>
         <RedirectToSignIn />

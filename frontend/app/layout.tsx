@@ -1,6 +1,6 @@
-// app/layout.tsx
 import type { Metadata } from 'next';
 import { ClerkProvider, SignedIn, SignedOut, UserButton, SignInButton, SignUpButton } from '@clerk/nextjs';
+import Link from "next/link";
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -19,7 +19,9 @@ export default function RootLayout({
         <body className="bg-gradient-to-b from-white to-gray-100 font-[Poppins]">
           {/* Header */}
           <header className="flex justify-between items-center p-4 gap-4 h-16 bg-white shadow-md">
-            <h1 className="text-xl font-bold text-[#202A41]">SentiMetrics</h1>
+            <h1 className="text-xl font-bold text-[#202A41] cursor-pointer">
+              <Link href="/">SentiMetrics</Link>
+            </h1>
             <div>
               <SignedOut>
                 <SignInButton />
