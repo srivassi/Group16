@@ -5,6 +5,7 @@ from atproto import Client
 from dotenv import load_dotenv
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from flask import Flask, request, jsonify, session
+from flask_session import Session
 import openai
 from datetime import timedelta
 
@@ -19,8 +20,10 @@ analyzer = SentimentIntensityAnalyzer()
 app = Flask(__name__)
 # Use a fixed secret key from the environment or default (ensure to set FLASK_SECRET_KEY in production)
 app.secret_key = app.secret_key = os.urandom(24)
-# Optionally set a permanent session lifetime (here, 7 days)
-app.permanent_session_lifetime = timedelta(days=7)
+app.config["SESSION_TYPE"] = "filesystem"  # You can use 'redis' or another backend as needed.
+# app.config["SESSION_PERMANENT"] = True
+# app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
+Session(app)
 
 # Load your credentials for Twitter and OpenAI.
 api_key = os.getenv("API_KEY_TWITTER")
@@ -37,7 +40,7 @@ client = Client()
 client.login(USERNAME, PASSWORD)
 
 # Function to fetch tweets from Twitter API
-def fetch_twitter_posts(keyword, max_results=100):
+def fetch_twitter_posts(keyword, max_results=30):
     url = "https://api.twitter.com/2/tweets/search/recent"
     headers = {"Authorization": f"Bearer {bearer_token}", "User-Agent": "v2RecentSearchPython"}
     params = {"query": keyword, "max_results": max_results, "tweet.fields": "created_at,author_id"}
@@ -52,7 +55,7 @@ def fetch_twitter_posts(keyword, max_results=100):
             tweets_data.append({"source": "Twitter", "text": text, "sentiment": sentiment})
     return tweets_data
 
-def fetch_bluesky_posts(keyword, limit=50):
+def fetch_bluesky_posts(keyword, limit=30):
     params = {'q': keyword, 'limit': limit}
     posts_data = []
 
@@ -73,8 +76,8 @@ keyword = "Pope Francis"  # Change the keyword if needed
 
 def getPosts(keyword):
     # Fetch posts from both sources
-    twitter_posts = fetch_twitter_posts(keyword, max_results=100)
-    bluesky_posts = fetch_bluesky_posts(keyword, limit=100)
+    twitter_posts = fetch_twitter_posts(keyword, max_results=20)
+    bluesky_posts = fetch_bluesky_posts(keyword, limit=20)
 
     # Combine results
     all_posts = twitter_posts + bluesky_posts
@@ -97,6 +100,20 @@ def getPosts(keyword):
     print(f"Total Posts Analyzed: {len(all_posts)}")
     
     return output_data
+
+    # Remove sentiment from each post for final JSON output
+    # filtered_posts = [{"source": post["source"], "text": post["text"]} for post in all_posts]
+
+    # output_data = {
+    #     "keyword": keyword,
+    #     "aggregate_sentiment": aggregate_sentiment,
+    #     "posts": filtered_posts
+    # }
+    
+    # print(f"Aggregate Sentiment Score: {aggregate_sentiment}")
+    # print(f"Total Posts Analyzed: {len(all_posts)}")
+    
+    # return output_data
 
 
 def build_system_prompt(full_data):
@@ -122,23 +139,25 @@ def build_system_prompt(full_data):
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
-    # Make the session permanent (if desired)
-    session.permanent = True
 
     # Initialize conversation history if it doesn't exist
     
     if 'messages' not in session:
-        session['messages'] = [{"role": "system", "content": "This Bot has not yet received the required information, prompt that to the user."}]
-    else:
+        session['messages'] = [
+            {"role": "system", "content": "This Bot has not yet received the required information. Please fetch posts first."}
+        ]
+    # Only append system prompt from posts once if it's not already there.
+    elif 'posts' in session and not any("system prompt:" in msg.get("content", "") for msg in session['messages']):
         post_data = session.get('posts', None)
         sys_prompt = build_system_prompt(post_data)
         session['messages'].append({"role": "system", "content": f"system prompt: {sys_prompt}"})
+    
 
     user_input = request.json.get("query", "Give me a summary of the data that you are working on")
     session['messages'].append({"role": "user", "content": user_input})
     
     try:
-        completion = client.chat.completions.create(
+        completion = openClient.chat.completions.create(
             model="gpt-3.5-turbo-0125",
             messages=session['messages'],
             temperature=0.5,
@@ -157,11 +176,12 @@ def posts_route():
     data = request.json
     keyword = data.get("keyword", "Pope Francis")
     output_data = getPosts(keyword)
+    # Ensure session['messages'] is initialized
+    if 'messages' not in session:
+        session['messages'] = []
     session['posts'] = output_data
     session['messages'].append({"role": "system", "content": f"Posts fetched for keyword: {keyword} are {output_data}"})
     return jsonify(output_data)
-
-
 
 if __name__ == '__main__':
     app.run(port=5000)
