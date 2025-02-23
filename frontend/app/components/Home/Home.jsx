@@ -18,6 +18,7 @@ const Home = () => {
   const [searchResult, setSearchResult] = useState(null);
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState([]);
+  const [chatMinimized, setChatMinimized] = useState(false);
 
   useEffect(() => {
     if (!vantaEffect) {
@@ -85,6 +86,13 @@ const Home = () => {
     }
   };
 
+  // Helper function to choose background color based on sentiment score
+  const getBackgroundColor = (score) => {
+    if (score > 0.05) return "#d4edda"; // positive: light green
+    else if (score < -0.05) return "#f8d7da"; // negative: light red
+    else return "#fff3cd"; // neutral: light yellow
+  };
+
   return (
     <div className="main" ref={vantaRef}>
       <Header />
@@ -111,10 +119,13 @@ const Home = () => {
         {searchResult && (
           <div className="search-results">
             <h2>Search Results for: {searchResult.keyword}</h2>
-            <p>Aggregate Sentiment: {searchResult.aggregate_sentiment}%</p>
+            <h2>Aggregate Sentiment: {searchResult.aggregate_sentiment}%</h2>
             <ul>
               {searchResult.posts.map((post, index) => (
-                <li key={index}>
+                <li
+                  key={index}
+                  style={{ backgroundColor: getBackgroundColor(post.sentiment.compound) }}
+                >
                   <strong>{post.source}:</strong> {post.text}
                   <br />
                   <em>Sentiment Score: {post.sentiment.compound}</em>
@@ -127,25 +138,35 @@ const Home = () => {
         {/* Chat window appears at the bottom right once posts are fetched */}
         {searchResult && (
           <div className="chat-window">
-            <h3>Chat With Bot</h3>
-            <div className="chat-log">
-              {chatMessages.length === 0 ? (
-                <p>No conversation yet.</p>
-              ) : (
-                chatMessages.map((msg, index) => (
-                  <div key={index} className={`chat-message ${msg.sender}`}>
-                    <strong>{msg.sender === "user" ? "You" : "Bot"}:</strong> {msg.text}
-                  </div>
-                ))
-              )}
+            <div 
+              className="chat-header" 
+              onClick={() => setChatMinimized(!chatMinimized)}
+              style={{cursor: "pointer"}}
+            >
+              <h3>Chat With Bot {chatMinimized ? "(+)" : "(-)"}</h3>
             </div>
-            <input
-              type="text"
-              placeholder="Enter your message..."
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              onKeyDown={handleChatKeyDown}
-            />
+            {!chatMinimized && (
+              <>
+                <div className="chat-log">
+                  {chatMessages.length === 0 ? (
+                    <p>No conversation yet.</p>
+                  ) : (
+                    chatMessages.map((msg, index) => (
+                      <div key={index} className={`chat-message ${msg.sender}`}>
+                        <strong>{msg.sender === "user" ? "You" : "Bot"}:</strong> {msg.text}
+                      </div>
+                    ))
+                  )}
+                </div>
+                <input
+                  type="text"
+                  placeholder="Enter your message..."
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={handleChatKeyDown}
+                />
+              </>
+            )}
           </div>
         )}
       </div>
