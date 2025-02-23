@@ -1,0 +1,7 @@
+Flask
+requests
+python-dotenv
+Flask-Session
+openai
+flask-cors
+atproto
