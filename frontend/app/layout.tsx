@@ -40,7 +40,7 @@ export default function RootLayout({
           <footer className="relative w-full bg-gray-800 text-[#E3E7EA] p-4 mt-10 flex justify-center items-center">
             <nav className="flex space-x-4">
               <a href="/about" className="hover:underline">About</a>
-              <a href="https://github.com/yourrepo" target="_blank" rel="noopener noreferrer" className="hover:underline">Look Under the Hood</a>
+              <a href="https://github.com/srivassi/Group16" target="_blank" rel="noopener noreferrer" className="hover:underline">Look Under the Hood</a>
             </nav>
           </footer>
         </body>
