@@ -1,4 +1,133 @@
 .main {
+frontend
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 50px;
+}
+
+
+.menuhome {
+  margin-top: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  padding-bottom: 50px; 
+}
+
+.menuhome li {
+  padding: 10px;
+  width: 100%;
+  background-color: rgb(5, 2, 108);
+  margin: 5px 0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+}
+
+.menuhome ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+ 
+  text-align: center;
+  margin-bottom: 400px;
+}
+
+.menuhome li:hover {
+  background-color: rgb(158, 160, 179);
+}
+
+
+.search-box {
+  background-color: rgba(38, 35, 35, 0.9);
+  border: 2px solid black;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+  position: relative;
+}
+
+
+input {
+  width: 90%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+
+
+.suggestions {
+  background: #fff;
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.suggestion {
+  padding: 8px;
+  cursor: pointer;
+  background: #f1f1f1;
+  margin-top: 5px;
+  border-radius: 5px;
+}
+
+.suggestion:hover {
+  background: #ff3f81;
+  color: white;
+}
+
+.search-results {
+  background-color: #fff;
+  color: #000;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  max-width: 600px;
+  width: 90%;
+  overflow-y: auto;
+  text-align: left;
+}
+
+
+.search-results h2 {
+  color: #ff3f81;
+  margin-bottom: 10px;
+}
+
+
+.search-results ul {
+  list-style: none;
+  padding: 0;
+}
+
+
+.search-results li {
+  background: #f8f9fa;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 5px;
+  border-left: 4px solid #e47ca1;
+}
+
+
+.search-results li strong {
+  color: #7453ac;
+}
+
     position: relative;
     width: 100vw;
     height: 100vh;
@@ -61,3 +190,4 @@
     background: #ddd;
   }
   
+
