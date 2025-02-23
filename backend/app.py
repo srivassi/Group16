@@ -52,7 +52,7 @@ def fetch_twitter_posts(keyword, max_results=100):
             tweets_data.append({"source": "Twitter", "text": text, "sentiment": sentiment})
     return tweets_data
 
-def fetch_bluesky_posts(keyword, limit=100):
+def fetch_bluesky_posts(keyword, limit=50):
     params = {'q': keyword, 'limit': limit}
     posts_data = []
 
@@ -98,29 +98,26 @@ def getPosts(keyword):
     
     return output_data
 
-getPosts()
 
-
-
-# def build_system_prompt(relevant_tweets):
-#     """
-#     Builds a system prompt containing the context of relevant tweets and their sentiment.
-#     """
-#     if not relevant_tweets:
-#         context_text = "No tweets were found matching the query."
-#     else:
-#         context_text = "\n".join(
-#             f"Tweet: {tweet['text']} (Sentiment: {tweet['sentiment']})"
-#             for tweet in relevant_tweets
-#         )
-#     system_prompt = (
-#         "You are a helpful assistant that answers questions based solely on a provided dataset of tweets "
-#         "and their sentiment scores. Below is the dataset context:\n\n"
-#         f"{context_text}\n\n"
-#         "Answer the user's question using only the above information."
-#     )
-#     return system_prompt
-
+def build_system_prompt(full_data):
+    """
+    Builds a system prompt containing the context of posts and their sentiment.
+    """
+    posts = full_data.get("posts", []) if full_data else []
+    if not posts:
+        context_text = "No posts were found for the provided keyword."
+    else:
+        context_text = "\n".join(
+            f"{post['source']} Post: {post['text']} (Sentiment: {post['sentiment']})"
+            for post in posts
+        )
+    system_prompt = (
+        "You are a helpful assistant that answers questions based solely on a provided dataset of posts "
+        "and their sentiment scores. Below is the dataset context:\n\n"
+        f"{context_text}\n\n"
+        "Answer the user's question using only the above information."
+    )
+    return system_prompt
 
 
 @app.route('/api/chat', methods=['POST'])
@@ -129,10 +126,15 @@ def chat():
     session.permanent = True
 
     # Initialize conversation history if it doesn't exist
+    
     if 'messages' not in session:
-        session['messages'] = [{"role": "system", "content": "This GPT, LSM Bot, is specialized in performing Linguistic Style Matching."}]
+        session['messages'] = [{"role": "system", "content": "This Bot has not yet received the required information, prompt that to the user."}]
+    else:
+        post_data = session.get('posts', None)
+        sys_prompt = build_system_prompt(post_data)
+        session['messages'].append({"role": "system", "content": f"system prompt: {sys_prompt}"})
 
-    user_input = request.json.get("query", "Just tell me if you are working fine please ")
+    user_input = request.json.get("query", "Give me a summary of the data that you are working on")
     session['messages'].append({"role": "user", "content": user_input})
     
     try:
@@ -148,6 +150,18 @@ def chat():
     except Exception as e:
         print("OpenAI API error:", e)
         return jsonify({"error": "Error communicating with OpenAI API"}), 500
+
+# New POST route to call getPosts(), store results in session, and return output data.
+@app.route('/api/getPosts', methods=['POST'])
+def posts_route():
+    data = request.json
+    keyword = data.get("keyword", "Pope Francis")
+    output_data = getPosts(keyword)
+    session['posts'] = output_data
+    session['messages'].append({"role": "system", "content": f"Posts fetched for keyword: {keyword} are {output_data}"})
+    return jsonify(output_data)
+
+
 
 if __name__ == '__main__':
     app.run(port=5000)
