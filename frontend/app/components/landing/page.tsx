@@ -33,7 +33,7 @@ const Page: React.FC = () => {
           <div className="bg-[#ABBCC9] p-8 rounded-xl flex items-center justify-center text-[#202A41] text-lg h-36 w-[70%] ml-16">
             This project aligns with Tines' philosophy of Automation, Simplicity and Efficiency by maximising human productivity and utilising Generative AI chatbots to further future productivity.
           </div>
-          <img src="/tines-logo.png" alt="Tines Logo" className="w-[120%] h-auto ml-24" />
+          <img src="/tines-logo-new.png" alt="Tines Logo" className="w-[120%] h-auto ml-24" />
         </div>
       </section>
     </div>

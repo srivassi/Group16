@@ -1,0 +1,59 @@
+/* Container should have full height and center content */
+.about-us-container {
+    text-align: center;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh; /* Full-screen height */
+    justify-content: flex-start; /* Center horizontally but leave some space above */
+}
+
+/* Header styling and initial hidden state */
+.meet-the-team-header {
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+    color: #202A41;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+/* When the header becomes visible, animate it into position */
+.meet-the-team-header.visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+/* Team section flexbox layout for responsive design */
+.team-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 40px; /* Space between sections */
+}
+
+/* Team member description styling */
+.description-box {
+    font-size: 16px;
+    color: #333;
+    background-color: #F7F7F7;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Animation for team member cards and descriptions */
+.team-section {
+    opacity: 0;
+    transform: translateX(100px); /* Initially offscreen */
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.team-section.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
