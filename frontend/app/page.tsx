@@ -1,34 +1,24 @@
-//Pages used to navigate between componenets 
+// app/page.tsx
+import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/nextjs';
+import Page from '@/app/components/landing/page';
 
 
-/* 1 */
-//Imports 
-import { SignedIn } from '@clerk/nextjs';
-import Home from './components/Home/Home.jsx'
-
-
-/* 2 */
-//Title of the browser page 
 export const metadata = {
-  title: 'Project 16', // title
+  title: 'SentiMetrics',
   icons: {
-    icon: '/logo-16.png', // logo'
-  },  
+    icon: '/vercel.svg',
+  },
 };
 
-
-/* 3 */
-//Main display 
 export default function HomePage() {
   return (
-    <div> 
-      <div> 
-        <SignedIn>
-
-          <Home/>
-
-        </SignedIn>
-      </div>
+    <div>
+      <SignedIn>
+        <Page />
+      </SignedIn>
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
     </div>
   );
 }
