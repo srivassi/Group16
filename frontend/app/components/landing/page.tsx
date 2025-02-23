@@ -18,9 +18,9 @@ const Page: React.FC = () => {
       </header>
 
       {/* Analytics Section - Above the Fold */}
-      <section className="w-full h-[60vh] flex flex-col justify-center items-center gap-6 px-12">
-        <div className="grid grid-cols-2 gap-1 w-full items-center px-10">
-          <img src="/analytics.png" alt="Analytics Icon" className="w-64 h-auto ml-32" />
+      <section className="w-full h-[50vh] flex flex-col justify-center items-center gap-1 px-12">
+        <div className="grid grid-cols-2 gap-2 w-full items-center px-10">
+          <img src="/analytics.png" alt="Analytics Icon" className="w-64 h-auto ml-64" />
           <div className="bg-[#ABBCC9] p-8 rounded-xl flex items-center justify-center text-[#202A41] text-lg h-36 w-[80%]">
             SentiMetrics automates brand value analysis based on public opinion by showing you the overall Sentiment Score for any discussions that interest you across X and BlueSky.
           </div>
@@ -28,12 +28,12 @@ const Page: React.FC = () => {
       </section>
 
       {/* Tines Section - Below the Fold */}
-      <section className="w-full h-[50vh] flex flex-col justify-center items-center gap-4 px-12">
-        <div className="grid grid-cols-2 gap-4 w-full items-center px-16">
-          <div className="bg-[#ABBCC9] p-8 rounded-xl flex items-center justify-center text-[#202A41] text-lg h-36 w-[70%] ml-16">
+      <section className="w-full h-[40vh] flex flex-col justify-center items-center gap-0 px-12">
+        <div className="grid grid-cols-2 gap-0 w-full items-center px-16">
+          <div className="bg-[#ABBCC9] p-8 rounded-xl flex items-center justify-center text-[#202A41] text-lg h-36 w-[70%] ml-32">
             This project aligns with Tines' philosophy of Automation, Simplicity and Efficiency by maximising human productivity and utilising Generative AI chatbots to further future productivity.
           </div>
-          <img src="/tines-logo-new.png" alt="Tines Logo" className="w-[120%] h-auto ml-24" />
+          <img src="/tines-logo-new.png" alt="Tines Logo" className="w-[90%] h-auto ml-12" />
         </div>
       </section>
     </div>
