@@ -124,9 +124,9 @@ const Home = () => {
           </div>
         )}
 
-        {/* Chat section always visible if posts have been fetched */}
+        {/* Chat window appears at the bottom right once posts are fetched */}
         {searchResult && (
-          <div className="chat-section">
+          <div className="chat-window">
             <h3>Chat With Bot</h3>
             <div className="chat-log">
               {chatMessages.length === 0 ? (
