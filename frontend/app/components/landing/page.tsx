@@ -12,7 +12,7 @@ const Page: React.FC = () => {
         <p className="text-sm text-[#202A41] mt-2 border-b-2 border-purple-500 pb-1 mb-4">
           A HackIreland Project powered by Tines
         </p>
-        <Link href='/page' className='mt-4 bg-[#202A41] text-[#E3E7EA] px-6 py-3 rounded-full font-semibold shadow-md hover:bg-[#404A61] transition inline-block text-center'>
+        <Link href='/enter-hashtags' className='mt-4 bg-[#202A41] text-[#E3E7EA] px-6 py-3 rounded-full font-semibold shadow-md hover:bg-[#404A61] transition inline-block text-center'>
           Get Started
         </Link>
       </header>
