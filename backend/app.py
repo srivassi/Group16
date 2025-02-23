@@ -8,6 +8,7 @@ from flask import Flask, request, jsonify, session
 from flask_session import Session
 import openai
 from datetime import timedelta
+from flask_cors import CORS  # new import
 
 OpenAI = openai.OpenAI
 
@@ -18,6 +19,7 @@ load_dotenv()
 analyzer = SentimentIntensityAnalyzer()
 
 app = Flask(__name__)
+CORS(app, supports_credentials=True)  # Updated to allow credentials in CORS
 # Use a fixed secret key from the environment or default (ensure to set FLASK_SECRET_KEY in production)
 app.secret_key = app.secret_key = os.urandom(24)
 app.config["SESSION_TYPE"] = "filesystem"  # You can use 'redis' or another backend as needed.
