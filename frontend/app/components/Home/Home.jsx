@@ -1,5 +1,4 @@
 "use client";
- frontend
 
 //imports
 import React, { useState, useEffect, useRef } from "react";
@@ -7,35 +6,23 @@ import "./Home.css";
 import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
 import Footer from "../Footer/Footer";
-frontend
 import NET from "vanta/dist/vanta.net.min";
 import * as THREE from "three";
-
-import NET from "vanta/dist/vanta.net.min"; // Import Vanta
-import * as THREE from "three"; // Import Three.js
 
 const Home = () => {
   const [search, setSearch] = useState("");
   const [vantaEffect, setVantaEffect] = useState(null);
-frontend
   const vantaRef = useRef(null);
 
   // State for JSON response
   const [searchResult, setSearchResult] = useState(null);
-
-  const vantaRef = useRef(null); // Reference for the background div
-main
 
   useEffect(() => {
     if (!vantaEffect) {
       setVantaEffect(
         NET({
           el: vantaRef.current,
-< frontend
           THREE,
-
-          THREE, // Explicitly pass THREE to avoid errors
-
           mouseControls: true,
           touchControls: true,
           gyroControls: false,
@@ -43,40 +30,25 @@ main
           minWidth: 200.0,
           scale: 1.0,
           scaleMobile: 1.0,
-frontend
           color: 0xff3f81,
           backgroundColor: 0x23153c,
-
-          color: 0xff3f81, // Orange particles
-          backgroundColor: 0x23153c, // Dark gray background
-
         })
       );
     }
     return () => {
-frontend
       if (vantaEffect) vantaEffect.destroy();
-
-      if (vantaEffect) vantaEffect.destroy(); // Cleanup on unmount
-
     };
   }, [vantaEffect]);
 
   const [hashtags] = useState([
     "#Examples",
     "#Pope Francis",
-frontend
-
-    "#Magnus Carlson",
-    
-
   ]);
 
   const filteredHashtags = hashtags.filter((tag) =>
     tag.toLowerCase().includes(search.toLowerCase())
   );
 
-frontend
   // Simulated API response
   const mockResponse = {
     keyword: "Pope Francis",
@@ -132,27 +104,18 @@ frontend
     }
   };
 
-
-
   return (
     <div className="main" ref={vantaRef}>
       <Header />
       <SideBar />
-frontend
       <div className="menuhome">
-
-      <div className="menu">
-main
         <div className="search-box">
           <input
             type="text"
             placeholder="Search hashtags..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-frontend
             onKeyDown={handleKeyDown} // Trigger search on Enter
-
-
           />
           <div className="suggestions">
             {filteredHashtags.map((tag, index) => (
@@ -162,7 +125,6 @@ frontend
             ))}
           </div>
         </div>
-frontend
 
         {/* Display JSON response after searching */}
         {searchResult && (
@@ -180,8 +142,6 @@ frontend
             </ul>
           </div>
         )}
-
-
       </div>
       <Footer />
     </div>
